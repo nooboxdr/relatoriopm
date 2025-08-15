@@ -3,27 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Relatório de Patrulhamento PM (Layout Final)</title>
+  <title>Relatório de Patrulhamento PM (Versão Finalíssima)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
   <style>
-    /* ===== PAINEL DE CONTROLE DE ESTILOS ===== */
-    /* Altere os valores aqui para ajustar o formulário inteiro. */
+    /* O CSS permanece o mesmo */
     :root {
-      /* -- FONTES -- */
-      --fonte-cabecalho-tabela: 8px;   /* Tamanho da fonte para "NOME", "RG/CIC", etc. */
-      --fonte-texto-tabela: 10px;      /* Tamanho da fonte do texto digitado nas tabelas. */
-      --fonte-checkbox-label: 5px;     /* Tamanho da fonte para "S", "N", "SIM", "NÃO". */
-
-      /* -- TAMANHOS -- */
-      --tamanho-checkbox: 6px;        /* Largura e altura do círculo do checkbox. */
-      
-      /* -- PDF -- */
-      --zoom-pdf: 1.57em;              /* "Zoom" geral do conteúdo no PDF gerado. */
+      --fonte-cabecalho-tabela: 9px;
+      --fonte-texto-tabela: 9px;
+      --fonte-checkbox-label: 8px;
+      --tamanho-checkbox: 8px;
+      --zoom-pdf: 1.63em;
     }
-    /* ============================================ */
-
     body { font-family: Arial, sans-serif; padding: 5px; background-color: #f9f9f9; margin: 0; font-size: 10px; }
     .container { width: 100%; max-width: 800px; margin: 0 auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1 ); box-sizing: border-box; }
     .page { padding: 15px; background: white; }
@@ -35,34 +27,29 @@
     .table-wrapper { overflow-x: auto; margin-bottom: 10px; }
     .data-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
     .data-table th, .data-table td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: middle; word-wrap: break-word; }
-    
-    /* Usando as variáveis do painel de controle */
     .data-table th { font-size: var(--fonte-cabecalho-tabela); }
     .data-table input[type="text"] { font-size: var(--fonte-texto-tabela); width: 100%; border: none; outline: none; background-color: transparent; text-align: center; padding: 4px 0; }
     .criminal-check { display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; }
     .criminal-check label { display: flex; align-items: center; gap: 2px; cursor: pointer; font-size: var(--fonte-checkbox-label); }
     .criminal-check input[type="radio"] { width: var(--tamanho-checkbox); height: var(--tamanho-checkbox); margin: 0; }
-
     .section-title { font-size: 11px; font-weight: bold; margin: 10px 0 5px; text-align: center; }
     .sintese-title { margin-top: 0; }
     .sintese-container { flex-grow: 1; display: flex; flex-direction: column; }
     .sintese { width: 100%; box-sizing: border-box; font-size: 10px; padding: 5px; border: 1px solid #000; margin: 5px 0; flex-grow: 1; min-height: 400px; font-family: Arial, sans-serif; resize: vertical; }
-    #sintese-espelho { display: none; width: 100%; box-sizing: border-box; font-size: 10px; padding: 5px; border: 1px solid #000; margin: 5px 0; flex-grow: 1; min-height: 400px; font-family: Arial, sans-serif; white-space: pre-wrap; word-wrap: break-word; }
+    #sintese-espelho { display: none; width: 100%; box-sizing: border-box; font-size: 10px; padding: 5px; border: 1px solid #000; margin: 5px 0; flex-grow: 1; min-height: 400px; font-family: Arial, sans-serif; white-space: pre-wrap; word-wrap: break-word; overflow: hidden; }
     .page-footer { margin-top: auto; padding-top: 20px; text-align: center; }
     .signature-container { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 40px; align-items: flex-start; }
     .signature-box { width: 48%; text-align: center; }
     .signature-pad-wrapper { position: relative; width: 100%; height: 100px; border-bottom: 1px solid #000; }
     .signature-pad-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: crosshair; }
     .signature-line-box { width: 100%; height: 100px; border-bottom: 1px solid #000; }
-    .signature-box button { font-size: 10px; padding: 2px 5px; margin-top: 5px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer; }
     .footer-text { font-size: 9px; font-style: italic; line-height: 1.3; text-decoration: overline; }
-    
     .pdf-view .container { font-size: var(--zoom-pdf); box-shadow: none; max-width: 100%; width: 100%; }
     .pdf-view .page { padding: 10px; border: none; position: relative; height: 277mm; box-sizing: border-box; }
     .pdf-view .sintese-container { height: 180mm; flex-grow: 0; min-height: 0; }
     .pdf-view .page-footer { position: absolute; bottom: 15px; left: 15px; right: 15px; padding-top: 0; margin-top: 0; }
     .pdf-view .footer-text { white-space: nowrap; font-size: 0.8em; }
-    .pdf-view .btn-container, .pdf-view #toast, .pdf-view .signature-box button { display: none; }
+    .pdf-view .btn-container, .pdf-view #toast { display: none; }
     #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 10; left: 50%; transform: translateX(-50%); bottom: 30px; font-size: 14px; }
     #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
     @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
@@ -72,11 +59,11 @@
     .btn-clear { background-color: #dc3545; }
     .btn-warning { background-color: #ffc107; color: #000; }
     .btn-success { background-color: #28a745; }
+    .btn-secondary { background-color: #6c757d; }
   </style>
 </head>
 <body>
 
-  <!-- O HTML e o JavaScript permanecem exatamente os mesmos -->
   <div class="container">
     <div id="pagina1" class="page">
       <img src="cabecalho.png" alt="Cabeçalho do Relatório" class="header-img"/>
@@ -108,7 +95,6 @@
             <div class="signature-pad-wrapper">
               <canvas id="signature-canvas" class="signature-pad-canvas"></canvas>
             </div>
-            <button type="button" id="clear-signature-btn">Limpar Assinatura</button>
           </div>
           <div class="signature-box">
             VISTO DO CMT CIA:
@@ -126,6 +112,7 @@
     <button class="btn" onclick="gerarPDF()">Gerar PDF</button>
     <button class="btn btn-clear" onclick="limparCampos()">Limpar Campos</button>
     <button class="btn btn-success" onclick="recarregarDados()">Recarregar Dados</button>
+    <button class="btn btn-secondary" id="clear-signature-btn">Limpar Assinatura</button>
     <button class="btn btn-warning" onclick="limparMemoria()">Limpar Memória</button>
   </div>
   
@@ -142,7 +129,7 @@
       for (let i = 0; i < 12; i++) { htmlPessoas += `<tr><td><input type="text" id="p_${i}_nome"></td><td><input type="text" id="p_${i}_rg"></td><td><input type="text" id="p_${i}_local"></td><td><input type="text" id="p_${i}_qtr"></td><td><div class="criminal-check"><label><input type="radio" id="p_${i}_crim_s" name="p_${i}_crim"> S</label>/<label><input type="radio" id="p_${i}_crim_n" name="p_${i}_crim"> N</label></div></td><td><input type="text" id="p_${i}_art"></td></tr>`; }
       tabelaPessoas.innerHTML = htmlPessoas + '</tbody>';
       const tabelaVeiculos = document.getElementById('tabela-veiculos');
-      let htmlVeiculos = `<thead><tr><th style="width: 20%;">MARCA/MOD</th><th style="width: 12%;">PLACAS</th><th style="width: 20%;">CONDUTOR</th><th style="width: 8%;">PGU</th><th style="width: 20%;">LOCAL</th><th style="width: 8%;">QTR</th><th style="width: 12%;">Criminal</th></tr></thead><tbody>`;
+      let htmlVeiculos = `<thead><tr><th style="width: 15%;">MARCA/MOD</th><th style="width: 12%;">PLACAS</th><th style="width: 20%;">CONDUTOR</th><th style="width: 13%;">PGU</th><th style="width: 22%;">LOCAL</th><th style="width: 6%;">QTR</th><th style="width: 12%;">Criminal</th></tr></thead><tbody>`;
       for (let i = 0; i < 10; i++) { htmlVeiculos += `<tr><td><input type="text" id="v_${i}_marca"></td><td><input type="text" id="v_${i}_placa"></td><td><input type="text" id="v_${i}_condutor"></td><td><input type="text" id="v_${i}_pgu"></td><td><input type="text" id="v_${i}_local"></td><td><input type="text" id="v_${i}_qtr"></td><td><div class="criminal-check"><label><input type="radio" id="v_${i}_crim_s" name="v_${i}_crim"> S</label>/<label><input type="radio" id="v_${i}_crim_n" name="v_${i}_crim"> N</label></div></td></tr>`; }
       tabelaVeiculos.innerHTML = htmlVeiculos + '</tbody>';
       document.getElementById('tabela-penha').innerHTML = `<thead><tr><th style="width: 30%;">NOME</th><th style="width: 15%;">TEL</th><th style="width: 10%;">BOPM</th><th style="width: 10%;">BOPC</th><th style="width: 20%;">NATUREZA</th><th style="width: 15%;">VISITA PM</th></tr></thead><tbody><tr><td><input type="text" id="penha_nome"></td><td><input type="text" id="penha_tel"></td><td><input type="text" id="penha_bopm"></td><td><input type="text" id="penha_bopc"></td><td><input type="text" id="penha_natureza"></td><td><div class="criminal-check"><label><input type="radio" id="penha_visita_s" name="penha_visita"> SIM</label>/<label><input type="radio" id="penha_visita_n" name="penha_visita"> NÃO</label></div></td></tr></tbody>`;
@@ -246,22 +233,30 @@
           backgroundColor: 'rgba(255, 255, 255, 0)',
           penColor: 'rgb(0, 0, 0)'
         });
+
+        // ===== FUNÇÃO DE CALIBRAGEM ATUALIZADA E CORRIGIDA =====
         function resizeCanvas() {
+          const data = signaturePad.toData(); // Salva a assinatura atual
           const ratio = Math.max(window.devicePixelRatio || 1, 1);
           canvas.width = canvas.offsetWidth * ratio;
           canvas.height = canvas.offsetHeight * ratio;
           canvas.getContext("2d").scale(ratio, ratio);
-          signaturePad.clear(); 
+          signaturePad.fromData(data); // Redesenha a assinatura no canvas redimensionado
         }
+
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
+        
         document.getElementById('clear-signature-btn').addEventListener('click', () => {
           signaturePad.clear();
           salvarDados();
+          mostrarToast("Assinatura limpa.");
         });
+
         signaturePad.addEventListener("endStroke", () => {
           salvarDados();
         });
+        
         carregarDados();
         document.querySelector('.container').addEventListener('input', salvarDados);
     });
