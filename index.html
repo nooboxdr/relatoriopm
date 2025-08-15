@@ -3,171 +3,256 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Relatório de Patrulhamento PM</title>
+  <title>Relatório de Patrulhamento PM (Assinatura Final)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
   <style>
-    /* CSS sem alterações */
-    body {
-      font-family: Arial, sans-serif; padding: 5px; background-color: #f9f9f9;
-      margin: 0; font-size: 10px;
-    }
-    .container {
-      width: 100%; max-width: 800px; margin: 0 auto; background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1  ); box-sizing: border-box;
-    }
+    /* O CSS permanece o mesmo da versão anterior, que estava visualmente correta */
+    body { font-family: Arial, sans-serif; padding: 5px; background-color: #f9f9f9; margin: 0; font-size: 10px; }
+    .container { width: 100%; max-width: 800px; margin: 0 auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1 ); box-sizing: border-box; }
     .page { padding: 15px; background: white; }
-    /* NOVO ESTILO PARA A IMAGEM DO CABEÇALHO */
-    .header-img {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    .info-table-compact {
-      width: 100%; border-collapse: collapse; margin-bottom: 10px;
-    }
-    .info-table-compact td {
-      border: 1px solid #000; padding: 1px 3px; font-size: 9px;
-    }
-    .info-table-compact input {
-      width: 100%; border: none; outline: none; font-size: 9px; background-color: transparent; padding: 2px 0;
-    }
+    #pagina2 { display: flex; flex-direction: column; min-height: 80vh; }
+    .header-img { width: 100%; margin-bottom: 10px; }
+    .info-table-compact { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+    .info-table-compact td { border: 1px solid #000; padding: 1px 3px; font-size: 9px; }
+    .info-table-compact input { width: 100%; border: none; outline: none; font-size: 9px; background-color: transparent; padding: 2px 0; }
     .table-wrapper { overflow-x: auto; margin-bottom: 10px; }
-    .data-table { width: 100%; border-collapse: collapse; font-size: 10px; }
-    .data-table th, .data-table td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: middle; }
-    .data-table input[type="text"] { width: 100%; border: none; outline: none; font-size: 10px; background-color: transparent; }
-    .criminal-check {
-      display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap;
-    }
-    .criminal-check label {
-      display: flex; align-items: center; gap: 2px; cursor: pointer;
-      font-size: 8px;
-    }
-    .criminal-check input[type="checkbox"] {
-      width: 10px; height: 10px; margin: 0;
-    }
-    .section-title { font-size: 11px; font-weight: bold; margin: 10px 0 5px; }
-    .sintese { width: 100%; box-sizing: border-box; font-size: 10px; padding: 5px; border: 1px solid #000; margin: 5px 0; height: 250px; }
-    .signature {
-      margin-top: 20px; display: flex; justify-content: space-between; font-size: 10px;
-    }
-    .signature div {
-      width: 48%; text-align: center;
-    }
-    .footer { text-align: center; font-size: 9px; margin-top: 20px; font-style: italic; line-height: 1.3; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
+    .data-table th, .data-table td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: middle; word-wrap: break-word; }
+    .data-table th { font-size: 9px; }
+    .data-table input[type="text"] { width: 100%; border: none; outline: none; font-size: 10px; background-color: transparent; text-align: center; padding: 4px 0; }
+    .criminal-check { display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; }
+    .criminal-check label { display: flex; align-items: center; gap: 2px; cursor: pointer; font-size: 8px; }
+    .criminal-check input[type="radio"] { width: 10px; height: 10px; margin: 0; }
+    .section-title { font-size: 11px; font-weight: bold; margin: 10px 0 5px; text-align: center; }
+    .sintese-title { margin-top: 0; }
+    .sintese-container { flex-grow: 1; display: flex; flex-direction: column; }
+    .sintese { width: 100%; box-sizing: border-box; font-size: 10px; padding: 5px; border: 1px solid #000; margin: 5px 0; flex-grow: 1; min-height: 400px; font-family: Arial, sans-serif; resize: vertical; }
+    #sintese-espelho { display: none; width: 100%; box-sizing: border-box; font-size: 10px; padding: 5px; border: 1px solid #000; margin: 5px 0; flex-grow: 1; min-height: 400px; font-family: Arial, sans-serif; white-space: pre-wrap; word-wrap: break-word; }
+    .page-footer { margin-top: auto; padding-top: 20px; text-align: center; }
+    .signature-container { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 40px; align-items: flex-start; }
+    .signature-box { width: 48%; text-align: center; }
+    .signature-pad-wrapper { position: relative; width: 100%; height: 100px; border-bottom: 1px solid #000; }
+    .signature-pad-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: crosshair; }
+    .signature-line-box { width: 100%; height: 100px; border-bottom: 1px solid #000; }
+    .signature-box button { font-size: 10px; padding: 2px 5px; margin-top: 5px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer; }
+    .footer-text { font-size: 9px; font-style: italic; line-height: 1.3; text-decoration: overline; }
+    .pdf-view .container { font-size: 1.53em; box-shadow: none; max-width: 100%; width: 100%; }
+    .pdf-view .page { padding: 10px; border: none; position: relative; height: 277mm; box-sizing: border-box; }
+    .pdf-view .sintese-container { height: 180mm; flex-grow: 0; min-height: 0; }
+    .pdf-view .page-footer { position: absolute; bottom: 15px; left: 15px; right: 15px; padding-top: 0; margin-top: 0; }
+    .pdf-view .footer-text { white-space: nowrap; font-size: 0.8em; }
+    .pdf-view .btn-container, .pdf-view #toast, .pdf-view .signature-box button { display: none; }
+    #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 10; left: 50%; transform: translateX(-50%); bottom: 30px; font-size: 14px; }
+    #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+    @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     .btn-container { text-align: center; padding: 15px; background-color: #f0f0f0; }
     .btn { padding: 10px 15px; margin: 5px; font-size: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
     .btn-clear { background-color: #dc3545; }
+    .btn-warning { background-color: #ffc107; color: #000; }
+    .btn-success { background-color: #28a745; }
   </style>
 </head>
 <body>
 
+  <!-- O HTML permanece o mesmo -->
   <div class="container">
-    <!-- PÁGINA 1 -->
     <div id="pagina1" class="page">
-      <!-- CABEÇALHO DE TEXTO SUBSTITUÍDO PELA IMAGEM -->
       <img src="cabecalho.png" alt="Cabeçalho do Relatório" class="header-img"/>
-      
       <table class="info-table-compact">
-        <tr><td>CÓDIGO DA OPM: <input type="text"></td><td>VIATURA: <input type="text"></td></tr>
-        <tr><td>DATA: <input type="text" id="data-automatica"></td><td>TURNO: <input type="text"></td></tr>
-        <tr><td>ENC./RE: <input type="text"></td><td>MOT./RE: <input type="text"></td></tr>
-        <tr><td>OBS: <input type="text"></td><td>OBS: <input type="text"></td></tr>
+        <tr><td>CÓDIGO DA OPM: <input type="text" id="info_opm"></td><td>VIATURA: <input type="text" id="info_viatura"></td></tr>
+        <tr><td>DATA: <input type="text" id="info_data"></td><td>TURNO: <input type="text" id="info_turno"></td></tr>
+        <tr><td>ENC./RE: <input type="text" id="info_enc_re"></td><td>MOT./RE: <input type="text" id="info_mot_re"></td></tr>
+        <tr><td colspan="2">OBS: <input type="text" id="info_obs_unificada"></td></tr>
       </table>
       <div class="section-title">ABORDAGENS REALIZADAS A PESSOAS</div>
       <div class="table-wrapper"><table class="data-table" id="tabela-pessoas"></table></div>
-    </div>
-
-    <!-- PÁGINA 2 -->
-    <div id="pagina2" class="page">
       <div class="section-title">ABORDAGENS A VEÍCULOS</div>
       <div class="table-wrapper"><table class="data-table" id="tabela-veiculos"></table></div>
       <div class="section-title">OCORRÊNCIAS LEI "MARIA DA PENHA"</div>
       <div class="table-wrapper"><table class="data-table" id="tabela-penha"></table></div>
-    </div>
-
-    <!-- PÁGINA 3 -->
-    <div id="pagina3" class="page">
       <div class="section-title">ESTATÍSTICA DA EQUIPE</div>
       <div class="table-wrapper"><table class="data-table" id="tabela-estatistica"></table></div>
-      <div class="section-title">SINTESE DO SERVIÇO</div>
-      <textarea class="sintese" id="sintese"></textarea>
-      <div class="signature">
-        <div>ENC. DE EQUIPE:  
-___________________________</div>
-        <div>VISTO DO CMT CIA:  
-_________________________</div>
+    </div>
+    <div id="pagina2" class="page">
+      <div class="section-title sintese-title">SINTESE DO SERVIÇO</div>
+      <div class="sintese-container">
+        <textarea class="sintese" id="sintese"></textarea>
+        <div id="sintese-espelho"></div>
       </div>
-      <div class="footer">
-        "Nós, Policiais Militares, estamos compromissados com a Defesa da Vida, da Integridade Física e da Dignidade da Pessoa Humana"
+      <div class="page-footer">
+        <div class="signature-container">
+          <div class="signature-box">
+            ENC. DE EQUIPE:
+            <div class="signature-pad-wrapper">
+              <canvas id="signature-canvas" class="signature-pad-canvas"></canvas>
+            </div>
+            <button type="button" id="clear-signature-btn">Limpar Assinatura</button>
+          </div>
+          <div class="signature-box">
+            VISTO DO CMT CIA:
+            <div class="signature-line-box"></div>
+          </div>
+        </div>
+        <div class="footer-text">
+          "Nós, Policiais Militares, estamos compromissados com a Defesa da Vida, da Integridade Física e da Dignidade da Pessoa Humana"
+        </div>
       </div>
     </div>
   </div>
 
   <div class="btn-container">
     <button class="btn" onclick="gerarPDF()">Gerar PDF</button>
-    <button class="btn btn-clear" onclick="limparForm()">Limpar</button>
+    <button class="btn btn-clear" onclick="limparCampos()">Limpar Campos</button>
+    <button class="btn btn-success" onclick="recarregarDados()">Recarregar Dados</button>
+    <button class="btn btn-warning" onclick="limparMemoria()">Limpar Memória</button>
   </div>
   
+  <div id="toast"></div>
+
   <script>
-    // Scripts de popular tabelas e data (sem alterações)
+    const FORM_ID = 'relatorio_patrulhamento_dados';
+    let saveTimeout;
+    let signaturePad;
+
+    // Funções de popular tabelas, toast, salvar, etc. (sem alterações)
     function popularTabelas() {
       const tabelaPessoas = document.getElementById('tabela-pessoas');
-      let htmlPessoas = '<thead><tr><th>NOME</th><th>RG/CIC</th><th>LOCAL</th><th>QTR</th><th>Criminal</th><th>Art.</th></tr></thead><tbody>';
-      for (let i = 0; i < 12; i++) { htmlPessoas += `<tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><div class="criminal-check"><label><input type="checkbox"> S</label>/<label><input type="checkbox"> N</label></div></td><td><input type="text"></td></tr>`; }
+      let htmlPessoas = `<thead><tr><th style="width: 30%;">NOME</th><th style="width: 15%;">RG/CIC</th><th style="width: 25%;">LOCAL</th><th style="width: 8%;">QTR</th><th style="width: 12%;">Criminal</th><th style="width: 10%;">Art.</th></tr></thead><tbody>`;
+      for (let i = 0; i < 12; i++) { htmlPessoas += `<tr><td><input type="text" id="p_${i}_nome"></td><td><input type="text" id="p_${i}_rg"></td><td><input type="text" id="p_${i}_local"></td><td><input type="text" id="p_${i}_qtr"></td><td><div class="criminal-check"><label><input type="radio" id="p_${i}_crim_s" name="p_${i}_crim"> S</label>/<label><input type="radio" id="p_${i}_crim_n" name="p_${i}_crim"> N</label></div></td><td><input type="text" id="p_${i}_art"></td></tr>`; }
       tabelaPessoas.innerHTML = htmlPessoas + '</tbody>';
       const tabelaVeiculos = document.getElementById('tabela-veiculos');
-      let htmlVeiculos = '<thead><tr><th>MARCA/MOD</th><th>PLACAS</th><th>CONDUTOR</th><th>PGU</th><th>LOCAL</th><th>QTR</th><th>Criminal</th><th>Art.</th></tr></thead><tbody>';
-      for (let i = 0; i < 10; i++) { htmlVeiculos += `<tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><div class="criminal-check"><label><input type="checkbox"> S</label>/<label><input type="checkbox"> N</label></div></td><td><input type="text"></td></tr>`; }
+      let htmlVeiculos = `<thead><tr><th style="width: 20%;">MARCA/MOD</th><th style="width: 12%;">PLACAS</th><th style="width: 20%;">CONDUTOR</th><th style="width: 8%;">PGU</th><th style="width: 20%;">LOCAL</th><th style="width: 8%;">QTR</th><th style="width: 12%;">Criminal</th></tr></thead><tbody>`;
+      for (let i = 0; i < 10; i++) { htmlVeiculos += `<tr><td><input type="text" id="v_${i}_marca"></td><td><input type="text" id="v_${i}_placa"></td><td><input type="text" id="v_${i}_condutor"></td><td><input type="text" id="v_${i}_pgu"></td><td><input type="text" id="v_${i}_local"></td><td><input type="text" id="v_${i}_qtr"></td><td><div class="criminal-check"><label><input type="radio" id="v_${i}_crim_s" name="v_${i}_crim"> S</label>/<label><input type="radio" id="v_${i}_crim_n" name="v_${i}_crim"> N</label></div></td></tr>`; }
       tabelaVeiculos.innerHTML = htmlVeiculos + '</tbody>';
-      document.getElementById('tabela-penha').innerHTML = `<thead><tr><th>NOME</th><th>TEL</th><th>BOPM</th><th>BOPC</th><th>NATUREZA</th><th>VISITA PM</th></tr></thead><tbody><tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><div class="criminal-check"><label><input type="checkbox"> SIM</label>/<label><input type="checkbox"> NÃO</label></div></td></tr></tbody>`;
-      document.getElementById('tabela-estatistica').innerHTML = `<thead><tr><th>PESSOAS</th><th>VEÍCULOS</th><th>MOTOS</th><th>AIT/AI</th><th>CR</th><th>ARMAS</th><th>FLAGRANTES</th><th>OUTROS</th></tr></thead><tbody><tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr><tr><td colspan="8">Nº SUBSETORES / CPP: <input type="text" style="width: 80%;"></td></tr></tbody>`;
+      document.getElementById('tabela-penha').innerHTML = `<thead><tr><th style="width: 30%;">NOME</th><th style="width: 15%;">TEL</th><th style="width: 10%;">BOPM</th><th style="width: 10%;">BOPC</th><th style="width: 20%;">NATUREZA</th><th style="width: 15%;">VISITA PM</th></tr></thead><tbody><tr><td><input type="text" id="penha_nome"></td><td><input type="text" id="penha_tel"></td><td><input type="text" id="penha_bopm"></td><td><input type="text" id="penha_bopc"></td><td><input type="text" id="penha_natureza"></td><td><div class="criminal-check"><label><input type="radio" id="penha_visita_s" name="penha_visita"> SIM</label>/<label><input type="radio" id="penha_visita_n" name="penha_visita"> NÃO</label></div></td></tr></tbody>`;
+      document.getElementById('tabela-estatistica').innerHTML = `<thead><tr><th>PESSOAS</th><th>VEÍCULOS</th><th>MOTOS</th><th>AIT/AI</th><th>CR</th><th>ARMAS</th><th>FLAGRANTES</th><th>OUTROS</th></tr></thead><tbody><tr><td><input type="text" id="est_pessoas"></td><td><input type="text" id="est_veiculos"></td><td><input type="text" id="est_motos"></td><td><input type="text" id="est_ait"></td><td><input type="text" id="est_cr"></td><td><input type="text" id="est_armas"></td><td><input type="text" id="est_flagrantes"></td><td><input type="text" id="est_outros"></td></tr><tr><td colspan="8">Nº SUBSETORES / CPP: <input type="text" id="est_subsetores" style="width: 80%;"></td></tr></tbody>`;
     }
-    function preencherData() {
-        const hoje = new Date();
-        const dia = String(hoje.getDate()).padStart(2, '0');
-        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-        const ano = hoje.getFullYear();
-        document.getElementById('data-automatica').value = `${dia}/${mes}/${ano}`;
+    function mostrarToast(mensagem) {
+      const toast = document.getElementById("toast");
+      toast.textContent = mensagem;
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
     }
-    document.addEventListener('DOMContentLoaded', () => {
-        popularTabelas();
-        preencherData();
-    });
-
-    // SCRIPT ATUALIZADO PARA 3 PÁGINAS
+    function salvarDados() {
+      const dados = {};
+      document.querySelectorAll('input[type="text"], textarea').forEach(input => { if (input.id) { dados[input.id] = input.value; } });
+      document.querySelectorAll('input[type="radio"]').forEach(radio => { if (radio.checked) { dados[radio.name] = radio.id; } });
+      if (signaturePad && !signaturePad.isEmpty()) {
+        dados['assinatura_encarregado'] = signaturePad.toDataURL();
+      } else {
+        delete dados['assinatura_encarregado'];
+      }
+      localStorage.setItem(FORM_ID, JSON.stringify(dados));
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => { mostrarToast("Alterações salvas!"); }, 1000);
+    }
+    function carregarDados() {
+      const dadosSalvos = localStorage.getItem(FORM_ID);
+      if (dadosSalvos) {
+        const dados = JSON.parse(dadosSalvos);
+        Object.keys(dados).forEach(key => {
+          if (key === 'assinatura_encarregado') {
+            if (signaturePad) {
+              signaturePad.fromDataURL(dados[key]);
+            }
+          } else {
+            const elemento = document.getElementById(key);
+            if (elemento && elemento.type !== 'radio') { elemento.value = dados[key]; }
+            else { const radioSalvo = document.getElementById(dados[key]); if (radioSalvo) { radioSalvo.checked = true; } }
+          }
+        });
+      }
+    }
+    function recarregarDados() { carregarDados(); mostrarToast("Dados recarregados da memória!"); }
+    function limparCampos() {
+      document.querySelectorAll('input[type="text"], textarea, input[type="radio"]').forEach(input => { input.type === 'radio' ? input.checked = false : input.value = ""; });
+      if (signaturePad) {
+        signaturePad.clear();
+      }
+      mostrarToast("Campos limpos!");
+    }
+    function limparMemoria() {
+      if (confirm("Tem certeza que deseja apagar todos os dados salvos na memória? Esta ação não pode ser desfeita.")) {
+        localStorage.removeItem(FORM_ID);
+        mostrarToast("Memória limpa com sucesso!");
+      }
+    }
     async function gerarPDF() {
+      mostrarToast("Preparando visualização para PDF...");
+      const sinteseTextarea = document.getElementById('sintese');
+      const sinteseEspelho = document.getElementById('sintese-espelho');
+      sinteseEspelho.textContent = sinteseTextarea.value;
+      sinteseTextarea.style.display = 'none';
+      sinteseEspelho.style.display = 'block';
+      document.body.classList.add('pdf-view');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      
-      const paginas = [document.getElementById('pagina1'), document.getElementById('pagina2'), document.getElementById('pagina3')];
-      
-      for (let i = 0; i < paginas.length; i++) {
-        const pagina = paginas[i];
-        // Adicionado para garantir que a imagem seja renderizada corretamente no PDF
-        const options = { scale: 4, useCORS: true };
-        
-        const canvas = await html2canvas(pagina, options);
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        const page_width = pdf.internal.pageSize.getWidth();
-        const content_width = page_width * 0.95;
-        const content_height = (canvas.height * content_width) / canvas.width;
-        const x_margin = (page_width - content_width) / 2;
-        const y_margin = 5;
-        
-        if (i > 0) { pdf.addPage(); }
-        pdf.addImage(imgData, 'JPEG', x_margin, y_margin, content_width, content_height);
+      const paginas = [document.getElementById('pagina1'), document.getElementById('pagina2')];
+      const MARGEM = 10;
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const contentWidth = pdfWidth - (MARGEM * 2);
+      const contentHeight = pdfHeight - (MARGEM * 2);
+      try {
+        for (let i = 0; i < paginas.length; i++) {
+          const pagina = paginas[i];
+          const canvas = await html2canvas(pagina, { scale: 2, useCORS: true, logging: false });
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          const ratio = Math.min(contentWidth / canvas.width, contentHeight / canvas.height);
+          const imgWidth = canvas.width * ratio;
+          const imgHeight = canvas.height * ratio;
+          const x = MARGEM + (contentWidth - imgWidth) / 2;
+          const y = MARGEM + (contentHeight - imgHeight) / 2;
+          if (i > 0) { pdf.addPage(); }
+          pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+        }
+        pdf.save("relatorio_final_2_paginas.pdf");
+        mostrarToast("PDF de 2 páginas gerado com sucesso!");
+      } catch (error) {
+        console.error("Erro ao gerar PDF:", error);
+        mostrarToast("Erro ao gerar PDF. Verifique o console.");
+      } finally {
+        document.body.classList.remove('pdf-view');
+        sinteseTextarea.style.display = 'block';
+        sinteseEspelho.style.display = 'none';
       }
-      pdf.save("relatorio_patrulhamento.pdf");
     }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        popularTabelas();
+        
+        const canvas = document.getElementById('signature-canvas');
+        signaturePad = new SignaturePad(canvas, {
+          backgroundColor: 'rgba(255, 255, 255, 0)',
+          penColor: 'rgb(0, 0, 0)'
+        });
 
-    function limparForm() {
-      document.querySelectorAll('input[type="text"], textarea').forEach(input => {
-          if(input.id !== 'data-automatica') {
-              input.value = "";
-          }
-      });
-      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
-    }
+        // ===== FUNÇÃO PARA CALIBRAR O CANVAS =====
+        function resizeCanvas() {
+          const ratio = Math.max(window.devicePixelRatio || 1, 1);
+          canvas.width = canvas.offsetWidth * ratio;
+          canvas.height = canvas.offsetHeight * ratio;
+          canvas.getContext("2d").scale(ratio, ratio);
+          signaturePad.clear(); // Limpa para evitar que a assinatura antiga seja redimensionada incorretamente
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas(); // Calibra na primeira carga
+
+        document.getElementById('clear-signature-btn').addEventListener('click', () => {
+          signaturePad.clear();
+          salvarDados();
+        });
+        signaturePad.addEventListener("endStroke", () => {
+          salvarDados();
+        });
+
+        carregarDados();
+        document.querySelector('.container').addEventListener('input', salvarDados);
+    });
   </script>
 
 </body>
