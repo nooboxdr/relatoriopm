@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Relatório de Patrulhamento PM (Versão Finalíssima)</title>
+  <title>Relatório de Patrulhamento PM (Versão Final)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
   <style>
-    /* O CSS permanece o mesmo */
+    /* Seus estilos CSS */
     :root {
-      --fonte-cabecalho-tabela: 9px;
-      --fonte-texto-tabela: 9px;
-      --fonte-checkbox-label: 8px;
-      --tamanho-checkbox: 8px;
+      --fonte-cabecalho-tabela: 8px;
+      --fonte-texto-tabela: 8px;
+      --fonte-checkbox-label: 7px;
+      --tamanho-checkbox: 7px;
       --zoom-pdf: 1.63em;
     }
     body { font-family: Arial, sans-serif; padding: 5px; background-color: #f9f9f9; margin: 0; font-size: 10px; }
@@ -22,8 +22,23 @@
     #pagina2 { display: flex; flex-direction: column; min-height: 80vh; }
     .header-img { width: 100%; margin-bottom: 10px; }
     .info-table-compact { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-    .info-table-compact td { border: 1px solid #000; padding: 1px 3px; font-size: 9px; }
+    .info-table-compact td { border: 1px solid #000; padding: 1px 3px; font-size: 9px; position: relative; }
     .info-table-compact input { width: 100%; border: none; outline: none; font-size: 9px; background-color: transparent; padding: 2px 0; }
+    
+    #info_data_real {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    /* ===== ALINHAMENTO DA DATA AJUSTADO AQUI ===== */
+    #info_data_formatada {
+      text-align: left; /* Alterado de 'center' para 'left' */
+    }
+
     .table-wrapper { overflow-x: auto; margin-bottom: 10px; }
     .data-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
     .data-table th, .data-table td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: middle; word-wrap: break-word; }
@@ -69,7 +84,14 @@
       <img src="cabecalho.png" alt="Cabeçalho do Relatório" class="header-img"/>
       <table class="info-table-compact">
         <tr><td>CÓDIGO DA OPM: <input type="text" id="info_opm"></td><td>VIATURA: <input type="text" id="info_viatura"></td></tr>
-        <tr><td>DATA: <input type="date" id="info_data"></td><td>TURNO: <input type="text" id="info_turno"></td></tr>
+        <tr>
+          <td>
+            DATA: 
+            <input type="text" id="info_data_formatada" readonly placeholder="DD/MM/AAAA">
+            <input type="date" id="info_data_real">
+          </td>
+          <td>TURNO: <input type="text" id="info_turno"></td>
+        </tr>
         <tr><td>ENC./RE: <input type="text" id="info_enc_re"></td><td>MOT./RE: <input type="text" id="info_mot_re"></td></tr>
         <tr><td colspan="2">OBS: <input type="text" id="info_obs_unificada"></td></tr>
       </table>
@@ -132,7 +154,7 @@
       let htmlVeiculos = `<thead><tr><th style="width: 15%;">MARCA/MOD</th><th style="width: 12%;">PLACAS</th><th style="width: 20%;">CONDUTOR</th><th style="width: 13%;">PGU</th><th style="width: 22%;">LOCAL</th><th style="width: 6%;">QTR</th><th style="width: 12%;">Criminal</th></tr></thead><tbody>`;
       for (let i = 0; i < 10; i++) { htmlVeiculos += `<tr><td><input type="text" id="v_${i}_marca"></td><td><input type="text" id="v_${i}_placa"></td><td><input type="text" id="v_${i}_condutor"></td><td><input type="text" id="v_${i}_pgu"></td><td><input type="text" id="v_${i}_local"></td><td><input type="text" id="v_${i}_qtr"></td><td><div class="criminal-check"><label><input type="radio" id="v_${i}_crim_s" name="v_${i}_crim"> S</label>/<label><input type="radio" id="v_${i}_crim_n" name="v_${i}_crim"> N</label></div></td></tr>`; }
       tabelaVeiculos.innerHTML = htmlVeiculos + '</tbody>';
-      document.getElementById('tabela-penha').innerHTML = `<thead><tr><th style="width: 30%;">NOME</th><th style="width: 15%;">TEL</th><th style="width: 10%;">BOPM</th><th style="width: 10%;">BOPC</th><th style="width: 20%;">NATUREZA</th><th style="width: 15%;">VISITA PM</th></tr></thead><tbody><tr><td><input type="text" id="penha_nome"></td><td><input type="text" id="penha_tel"></td><td><input type="text" id="penha_bopm"></td><td><input type="text" id="penha_bopc"></td><td><input type="text" id="penha_natureza"></td><td><div class="criminal-check"><label><input type="radio" id="penha_visita_s" name="penha_visita"> SIM</label>/<label><input type="radio" id="penha_visita_n" name="penha_visita"> NÃO</label></div></td></tr></tbody>`;
+      document.getElementById('tabela-penha').innerHTML = `<thead><tr><th style="width: 30%;">NOME</th><th style="width: 15%;">TEL</th><th style="width: 10%;">BOPM</th><th style="width: 10%;">BOPC</th><th style="width: 20%;">NATUREZA</th><th style="width: 18%;">VISITA PM</th></tr></thead><tbody><tr><td><input type="text" id="penha_nome"></td><td><input type="text" id="penha_tel"></td><td><input type="text" id="penha_bopm"></td><td><input type="text" id="penha_bopc"></td><td><input type="text" id="penha_natureza"></td><td><div class="criminal-check"><label><input type="radio" id="penha_visita_s" name="penha_visita"> SIM</label>/<label><input type="radio" id="penha_visita_n" name="penha_visita"> NÃO</label></div></td></tr></tbody>`;
       document.getElementById('tabela-estatistica').innerHTML = `<thead><tr><th>PESSOAS</th><th>VEÍCULOS</th><th>MOTOS</th><th>AIT/AI</th><th>CR</th><th>ARMAS</th><th>FLAGRANTES</th><th>OUTROS</th></tr></thead><tbody><tr><td><input type="text" id="est_pessoas"></td><td><input type="text" id="est_veiculos"></td><td><input type="text" id="est_motos"></td><td><input type="text" id="est_ait"></td><td><input type="text" id="est_cr"></td><td><input type="text" id="est_armas"></td><td><input type="text" id="est_flagrantes"></td><td><input type="text" id="est_outros"></td></tr><tr><td colspan="8">Nº SUBSETORES / CPP: <input type="text" id="est_subsetores" style="width: 80%;"></td></tr></tbody>`;
     }
     function mostrarToast(mensagem) {
@@ -143,7 +165,7 @@
     }
     function salvarDados() {
       const dados = {};
-      document.querySelectorAll('input[type="text"], textarea').forEach(input => { if (input.id) { dados[input.id] = input.value; } });
+      document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(input => { if (input.id) { dados[input.id] = input.value; } });
       document.querySelectorAll('input[type="radio"]').forEach(radio => { if (radio.checked) { dados[radio.name] = radio.id; } });
       if (signaturePad && !signaturePad.isEmpty()) {
         dados['assinatura_encarregado'] = signaturePad.toDataURL();
@@ -160,23 +182,27 @@
         const dados = JSON.parse(dadosSalvos);
         Object.keys(dados).forEach(key => {
           if (key === 'assinatura_encarregado') {
-            if (signaturePad) {
-              signaturePad.fromDataURL(dados[key]);
-            }
+            if (signaturePad) { signaturePad.fromDataURL(dados[key]); }
           } else {
             const elemento = document.getElementById(key);
             if (elemento && elemento.type !== 'radio') { elemento.value = dados[key]; }
             else { const radioSalvo = document.getElementById(dados[key]); if (radioSalvo) { radioSalvo.checked = true; } }
           }
         });
+        const dataReal = document.getElementById('info_data_real').value;
+        if (dataReal) {
+          const [ano, mes, dia] = dataReal.split('-');
+          document.getElementById('info_data_formatada').value = `${dia}/${mes}/${ano}`;
+        }
       }
     }
     function recarregarDados() { carregarDados(); mostrarToast("Dados recarregados da memória!"); }
     function limparCampos() {
-      document.querySelectorAll('input[type="text"], textarea, input[type="radio"]').forEach(input => { input.type === 'radio' ? input.checked = false : input.value = ""; });
-      if (signaturePad) {
-        signaturePad.clear();
-      }
+      document.querySelectorAll('input[type="text"], input[type="date"], textarea, input[type="radio"]').forEach(input => {
+        if (input.type === 'radio') { input.checked = false; }
+        else { input.value = ""; }
+      });
+      if (signaturePad) { signaturePad.clear(); }
       mostrarToast("Campos limpos!");
     }
     function limparMemoria() {
@@ -233,30 +259,36 @@
           backgroundColor: 'rgba(255, 255, 255, 0)',
           penColor: 'rgb(0, 0, 0)'
         });
-
-        // ===== FUNÇÃO DE CALIBRAGEM ATUALIZADA E CORRIGIDA =====
         function resizeCanvas() {
-          const data = signaturePad.toData(); // Salva a assinatura atual
+          const data = signaturePad.toData();
           const ratio = Math.max(window.devicePixelRatio || 1, 1);
           canvas.width = canvas.offsetWidth * ratio;
           canvas.height = canvas.offsetHeight * ratio;
           canvas.getContext("2d").scale(ratio, ratio);
-          signaturePad.fromData(data); // Redesenha a assinatura no canvas redimensionado
+          signaturePad.fromData(data);
         }
-
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
-        
         document.getElementById('clear-signature-btn').addEventListener('click', () => {
           signaturePad.clear();
           salvarDados();
           mostrarToast("Assinatura limpa.");
         });
-
-        signaturePad.addEventListener("endStroke", () => {
+        signaturePad.addEventListener("endStroke", () => { salvarDados(); });
+        
+        const dataRealInput = document.getElementById('info_data_real');
+        const dataFormatadaInput = document.getElementById('info_data_formatada');
+        dataRealInput.addEventListener('change', () => {
+          const valorData = dataRealInput.value;
+          if (valorData) {
+            const [ano, mes, dia] = valorData.split('-');
+            dataFormatadaInput.value = `${dia}/${mes}/${ano}`;
+          } else {
+            dataFormatadaInput.value = '';
+          }
           salvarDados();
         });
-        
+
         carregarDados();
         document.querySelector('.container').addEventListener('input', salvarDados);
     });
