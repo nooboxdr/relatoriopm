@@ -11,7 +11,7 @@
     /* Seus estilos CSS */
     :root {
       --fonte-cabecalho-tabela: 8px;
-      --fonte-texto-tabela: 8px;
+      --fonte-texto-tabela: 9px;
       --fonte-checkbox-label: 7px;
       --tamanho-checkbox: 7px;
       --zoom-pdf: 1.63em;
@@ -34,16 +34,27 @@
       opacity: 0;
       cursor: pointer;
     }
-    /* ===== ALINHAMENTO DA DATA AJUSTADO AQUI ===== */
     #info_data_formatada {
-      text-align: left; /* Alterado de 'center' para 'left' */
+      text-align: left;
     }
 
     .table-wrapper { overflow-x: auto; margin-bottom: 10px; }
     .data-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
     .data-table th, .data-table td { border: 1px solid #000; padding: 2px; text-align: center; vertical-align: middle; word-wrap: break-word; }
     .data-table th { font-size: var(--fonte-cabecalho-tabela); }
-    .data-table input[type="text"] { font-size: var(--fonte-texto-tabela); width: 100%; border: none; outline: none; background-color: transparent; text-align: center; padding: 4px 0; }
+    
+    /* ===== ALINHAMENTO VERTICAL DO TEXTO CORRIGIDO AQUI ===== */
+    .data-table input[type="text"] {
+      font-size: var(--fonte-texto-tabela);
+      width: 100%;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      text-align: center;
+      padding: 4px 0;
+      vertical-align: middle; /* Garante que o texto suba para o meio */
+    }
+
     .criminal-check { display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; }
     .criminal-check label { display: flex; align-items: center; gap: 2px; cursor: pointer; font-size: var(--fonte-checkbox-label); }
     .criminal-check input[type="radio"] { width: var(--tamanho-checkbox); height: var(--tamanho-checkbox); margin: 0; }
@@ -79,6 +90,7 @@
 </head>
 <body>
 
+  <!-- O HTML permanece o mesmo -->
   <div class="container">
     <div id="pagina1" class="page">
       <img src="cabecalho.png" alt="Cabeçalho do Relatório" class="header-img"/>
@@ -141,6 +153,7 @@
   <div id="toast"></div>
 
   <script>
+    // O JavaScript permanece o mesmo
     const FORM_ID = 'relatorio_patrulhamento_dados';
     let saveTimeout;
     let signaturePad;
